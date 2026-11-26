@@ -147,9 +147,13 @@ pub enum Stage {
     GammaExpandSrgb,
     GammaExpandDestinationSrgb,
     GammaCompressSrgb,
+    /// Unwrap a unit angle across the 0/1 (zero degree) seam and map it onto
+    /// the gradient's [0, 1] parameter range. Used by sweep gradients whose
+    /// clockwise arc crosses zero degrees.
+    SweepScaleBias,
 }
 
-pub const STAGES_COUNT: usize = Stage::GammaCompressSrgb as usize + 1;
+pub const STAGES_COUNT: usize = Stage::SweepScaleBias as usize + 1;
 
 impl PixmapRef<'_> {
     #[inline(always)]
@@ -260,6 +264,7 @@ pub struct Context {
     pub evenly_spaced_2_stop_gradient: EvenlySpaced2StopGradientCtx,
     pub gradient: GradientCtx,
     pub two_point_conical_gradient: TwoPointConicalGradientCtx,
+    pub sweep_gradient: SweepGradientCtx,
     pub limit_x: TileCtx,
     pub limit_y: TileCtx,
     pub transform: Transform,
@@ -339,6 +344,16 @@ pub struct TwoPointConicalGradientCtx {
     pub mask: u32x8,
     pub p0: f32,
     pub p1: f32,
+}
+
+/// Parameters of the `SweepScaleBias` stage.
+///
+/// `t0` is the sweep arc's start angle in normalized [0, 1) turns and
+/// `scale` maps the (unwrapped) clockwise arc length onto the [0, 1] range.
+#[derive(Copy, Clone, Default, Debug)]
+pub struct SweepGradientCtx {
+    pub t0: f32,
+    pub scale: f32,
 }
 
 #[derive(Copy, Clone, Default, Debug)]

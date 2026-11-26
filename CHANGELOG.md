@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- `SweepGradient` now accepts a clockwise arc that crosses the zero-degree
+  seam: pass `start_angle > end_angle` (for example 315° to 45°) to spread the
+  stops from `start_angle` around 0° to `end_angle`. Colors outside the arc
+  follow the selected `SpreadMode`, so every direction gets a definite color.
+  Ordinary (non-wrapping) intervals and full-circle sweeps keep their previous
+  behavior.
 
 ## [0.12.0] - 2026-02-02
 ### Fixed

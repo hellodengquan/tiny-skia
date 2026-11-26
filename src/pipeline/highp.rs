@@ -136,6 +136,7 @@ pub const STAGES: &[StageFn; super::STAGES_COUNT] = &[
     gamma_expand_srgb,
     gamma_expand_dst_srgb,
     gamma_compress_srgb,
+    sweep_scale_bias,
 ];
 
 pub fn fn_ptr(f: StageFn) -> *const () {
@@ -1132,6 +1133,29 @@ fn apply_concentric_scale_bias(p: &mut Pipeline) {
     // Apply t = t * scale + bias for concentric gradients
     let x = p.r;
     p.r = x * f32x8::splat(ctx.p0) + f32x8::splat(ctx.p1);
+
+    p.next_stage();
+}
+
+fn sweep_scale_bias(p: &mut Pipeline) {
+    let ctx = &p.ctx.sweep_gradient;
+
+    // The sweep arc runs clockwise from `t0` and crosses the 0/1 seam, so its
+    // angles are represented as `t0 .. 1` followed by `0 .. t1`. Unwrap the
+    // unit angle produced by `XYToUnitAngle` onto a continuous axis that starts
+    // at `t0`, then map the arc onto the gradient's [0, 1] range:
+    //
+    //   unwrapped = phi - floor(phi - t0)
+    //   t         = (unwrapped - t0) * scale
+    //
+    // Points inside the arc get t in [0, 1]. Points in the complementary arc
+    // stay below 0 (before the start) or above 1 (past the end), which lets
+    // the regular Pad/Repeat/Reflect stages pick a definite color in every
+    // direction.
+    let phi = p.r;
+    let t0 = f32x8::splat(ctx.t0);
+    let unwrapped = phi - (phi - t0).floor();
+    p.r = (unwrapped - t0) * f32x8::splat(ctx.scale);
 
     p.next_stage();
 }

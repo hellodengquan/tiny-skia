@@ -151,6 +151,7 @@ pub const STAGES: &[StageFn; super::STAGES_COUNT] = &[
     null_fn, // GammaExpandSrgb
     null_fn, // GammaExpandDestinationSrgb
     null_fn, // GammaCompressSrgb
+    null_fn, // SweepScaleBias
 ];
 
 pub fn fn_ptr(f: StageFn) -> *const () {
