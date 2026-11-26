@@ -10,3 +10,4 @@
 #[rustfmt::skip] mod png;
 #[rustfmt::skip] mod skia_dash;
 #[rustfmt::skip] mod stroke;
+#[rustfmt::skip] mod tiled_sampling;
