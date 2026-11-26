@@ -1,6 +1,7 @@
 #[rustfmt::skip] mod mask;
 #[rustfmt::skip] mod dash;
 #[rustfmt::skip] mod fill;
+#[rustfmt::skip] mod focal_outside_radial;
 #[rustfmt::skip] mod gamma;
 #[rustfmt::skip] mod gradients;
 #[rustfmt::skip] mod hairline;
